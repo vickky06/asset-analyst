@@ -3,6 +3,7 @@ from asset_analyst.configs.config_init import Config
 import sys
 import json
 
+
 def _to_jsonable(obj):
     try:
         # If it's a LangChain message, use its content
@@ -17,6 +18,7 @@ def _to_jsonable(obj):
     except Exception:
         return str(obj)
 
+
 def main():
     config = Config()
     config.validate()
@@ -25,7 +27,7 @@ def main():
     #         'Usage: asset-analyst "Your asset question (e.g., Should I buy NVDA now?)"'
     #     )
     #     sys.exit(1)
-    question = """TSLA stock analysis 12-18 month outlook""" #sys.argv[1]
+    question = """TSLA stock analysis 12-18 month outlook"""  # sys.argv[1]
     app = build_graph()
     state = {"question": question, "status": "init"}
     final = app.invoke(state)
@@ -33,6 +35,7 @@ def main():
     print(json.dumps(_to_jsonable(final.get("research", {})), indent=2))
     print("\n=== Analysis ===")
     print(json.dumps(_to_jsonable(final.get("analysis", {})), indent=2))
+
 
 if __name__ == "__main__":
     main()

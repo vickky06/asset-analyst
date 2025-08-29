@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from langchain_core.language_models import BaseChatModel
 
+
 class LLMInterface(ABC):
     @property
     @abstractmethod
@@ -21,6 +22,8 @@ class LLMInterface(ABC):
         pass
 
     @abstractmethod
-    def get_llm_ai(self, temperature : float| None = None) -> BaseChatModel:
+    def get_llm_ai(
+        self, temperature: float | None = None, model_name: str | None = None
+    ) -> BaseChatModel:
         """Must return a chat model instance"""
         pass

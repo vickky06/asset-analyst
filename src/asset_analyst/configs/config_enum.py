@@ -22,5 +22,6 @@ class ConfigEnum(Enum):
     ANTHROPIC_API_KEY = "ANTHROPIC_API_KEY"
     GROQ_MODEL_NAME = "GROQ_MODEL_NAME"
     GROQ_API_KEY = "GROQ_API_KEY"
+
     def __str__(self):
         return self.value

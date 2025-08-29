@@ -10,12 +10,14 @@ from asset_analyst.agents.analysis import Analysis
 from asset_analyst.agents.data_gathering import DataGathering
 from asset_analyst.schemas import ResearchData, InvestmentAnalysis
 
+
 class AnalysisState(TypedDict, total=False):
     question: str
-    research: Dict[str, Any]  
+    research: Dict[str, Any]
     analysis: Dict[str, Any]
     status: Literal["init", "researching", "analyzing", "done"]
     error: Optional[str]
+
 
 class SuperVise:
     def __init__(self):
@@ -30,10 +32,12 @@ class SuperVise:
                 k=int(self.config.TAVILY_SEARCH_COUNT or 5)
             )
             self.data_gathering_instance.add_tools([tavily_tool])
-            
+
             # This now returns a validated ResearchData.dict()
-            research = self.data_gathering_instance.run_data_gathering(state["question"])
-            
+            research = self.data_gathering_instance.run_data_gathering(
+                state["question"]
+            )
+
             return {**state, "research": research, "status": "analyzing"}
         except Exception as e:
             return {**state, "error": f"Research failed: {str(e)}", "status": "done"}
@@ -77,6 +81,7 @@ class SuperVise:
         if "ANALYZE" in res:
             return "analyze"
         return "finish"
+
 
 def build_graph():
     supervise_instance = SuperVise()

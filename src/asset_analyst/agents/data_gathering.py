@@ -53,14 +53,19 @@ class DataGathering:
 
     def _build_data_gathering_agent(self, system: str = SYSTEM) -> Runnable:
         try:
-            prompt = ChatPromptTemplate.from_messages([
-                ("system", system),
-                ("human", "User question:\n{task}\n\nSearch results:\n{results_json}")
-            ])
-            
+            prompt = ChatPromptTemplate.from_messages(
+                [
+                    ("system", system),
+                    (
+                        "human",
+                        "User question:\n{task}\n\nSearch results:\n{results_json}",
+                    ),
+                ]
+            )
+
             # Use structured output with tool choice enforcement
             chain = (
-                prompt 
+                prompt
                 | self.llm.bind_tools(tools=[ResearchData], tool_choice="ResearchData")
                 | self.parser
             )
@@ -74,13 +79,17 @@ class DataGathering:
             return []
         if isinstance(raw, list):
             return raw
-        if isinstance(raw, dict) and "results" in raw and isinstance(raw["results"], list):
+        if (
+            isinstance(raw, dict)
+            and "results" in raw
+            and isinstance(raw["results"], list)
+        ):
             return raw["results"]
         return []
 
     def _call_search_tools(self, task: str) -> List[Dict[str, Any]]:
         results: List[Dict[str, Any]] = []
-        
+
         # Try each tool via invoke/run with both input shapes
         for tool in self.tools:
             try:
@@ -98,12 +107,16 @@ class DataGathering:
                     results.extend(self._normalize_results(out3))
             except Exception:
                 pass
-                
+
         # Hard fallback: direct Tavily client
         if not results and TavilyClient and self.config.TAVILY_API_KEY:
             try:
                 client = TavilyClient(api_key=self.config.TAVILY_API_KEY)
-                out = client.search(task, search_depth="advanced", max_results=int(self.config.TAVILY_SEARCH_COUNT or 5))
+                out = client.search(
+                    task,
+                    search_depth="advanced",
+                    max_results=int(self.config.TAVILY_SEARCH_COUNT or 5),
+                )
                 results.extend(self._normalize_results(out))
             except Exception as e:
                 print("Direct Tavily client error:", str(e))
@@ -121,37 +134,35 @@ class DataGathering:
                     sources.append({"title": title, "url": url, "snippet": snippet})
 
             chain = self._build_data_gathering_agent()
-            result = chain.invoke({
-                "task": task,
-                "results_json": json.dumps(sources[:10], ensure_ascii=False),
-            })
-            
+            result = chain.invoke(
+                {
+                    "task": task,
+                    "results_json": json.dumps(sources[:10], ensure_ascii=False),
+                }
+            )
+
             # result is now a validated ResearchData object
             return self._parse_result(result)
-            
+
         except Exception as e:
             print("Error while gathering Data. ", str(e))
             # Return fallback structure if parsing fails
             return {
                 "sources": [],
                 "summary": f"Error during research: {str(e)}",
-                "key_metrics": {}
+                "key_metrics": {},
             }
 
-    def _parse_result(self,result: Any):
+    def _parse_result(self, result: Any):
         if isinstance(result, list) and len(result) > 0:
-                # Take the first result if it's a list
-                result = result[0]
-            
+            # Take the first result if it's a list
+            result = result[0]
+
         # result should now be a validated ResearchData object
-        if hasattr(result, 'dict'):
+        if hasattr(result, "dict"):
             return result.dict()
         elif isinstance(result, dict):
             return result
         else:
             # Fallback if result is unexpected
-            return {
-                "sources": [],
-                "summary": str(result),
-                "key_metrics": {}
-            }
+            return {"sources": [], "summary": str(result), "key_metrics": {}}

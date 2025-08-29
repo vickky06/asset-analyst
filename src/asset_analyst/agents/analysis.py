@@ -7,6 +7,7 @@ from asset_analyst.schemas.prompts import ANALYSIS_PROMT
 
 SYSTEM = ANALYSIS_PROMT
 
+
 class Analysis:
     def __init__(self):
         self.llm = make_llm(temperature=0.2)
@@ -19,7 +20,9 @@ class Analysis:
                     ("human", "Research:\n{research}\n\nUser question:\n{question}"),
                 ]
             )
-            chain = (prompt | self.llm.bind_tools(tools = [InvestmentAnalysis], tool_choice = "InvestmentAnalysis"))
+            chain = prompt | self.llm.bind_tools(
+                tools=[InvestmentAnalysis], tool_choice="InvestmentAnalysis"
+            )
             return chain
         except Exception as e:
             print("Error while building Analysis Agent", str(e))
