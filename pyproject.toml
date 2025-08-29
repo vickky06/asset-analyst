@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "asset-analyst"
+version = "0.1.0"
+description = "Multi-agent asset analysis with LangGraph + Gemini + Tavily"
+authors = ["Vivek Singh <vivek.singh.6967@gmail.com>"]
+packages = [{ include = "asset_analyst", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+langchain = "^0.3.27"
+langgraph = "^0.6.6"
+langsmith = "^0.4.19"
+langchain-google-genai = "^2.1.10"
+langchain-community = "^0.3.29"
+tavily-python = "^0.7.11"
+pydantic = "^2.11.7"
+python-dotenv = "^1.1.1"
+dotenv = "^0.9.9"
+black = "^25.1.0"
+langchain-tavily = "^0.2.11"
+langchain-openai = "^0.3.32"
+langchain-anthropic = "^0.3.19"
+langchain-groq = "^0.3.7"
+
+[tool.poetry.scripts]
+asset-analyst = "asset_analyst.run:main"

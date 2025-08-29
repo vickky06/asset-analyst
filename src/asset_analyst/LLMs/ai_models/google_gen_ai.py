@@ -1,0 +1,32 @@
+from asset_analyst.LLMs.interface import LLMInterface
+from asset_analyst.configs.config_init import Config
+from langchain_core.language_models import BaseChatModel
+from langchain_google_genai import ChatGoogleGenerativeAI
+config_instance = Config()
+
+class GoogleGenAILLM(LLMInterface):
+    def __init__(self,temperature: float = config_instance.MODEL_TEMPERATURE) -> None:
+        self._model:str = config_instance.GOOGLE_MODEL
+        self._api_key:str = config_instance.GOOGLE_API_KEY
+        self._temperature:float = config_instance.MODEL_TEMPERATURE
+    
+    @property
+    def model(self) -> str:
+        return self._model
+
+    @property
+    def api_key(self) -> str:
+        return self._api_key
+
+    @property
+    def temperature(self) -> float:
+        return self._temperature
+
+    def get_llm_ai(self, temperature:float = -1.0) -> BaseChatModel:
+        if temperature<0:
+            temperature = float(self._temperature)
+        return ChatGoogleGenerativeAI(
+            model=self._model,
+            google_api_key=self._api_key,
+            temperature=temperature,
+        )
